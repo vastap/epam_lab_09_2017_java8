@@ -16,6 +16,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 // JSR-335 Lambda Expressions for the Java Programming Language
 
@@ -65,6 +66,9 @@ public class Lambdas01 {
         if (person != null) {
             person.print();
         }
+
+        assertNotNull(person);
+        assertEquals(new Person("name 1", "lastName 2", 40), person);
     }
 
     @Test
@@ -85,7 +89,10 @@ public class Lambdas01 {
 
         if (personOptional.isPresent()) {
             personOptional.get().print();
+            assertNotNull(personOptional.get());
+            assertEquals(new Person("name 1", "lastName 2", 40), personOptional.get());
         }
+
     }
 
     @Test
