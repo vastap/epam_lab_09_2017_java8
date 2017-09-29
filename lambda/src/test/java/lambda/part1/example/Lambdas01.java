@@ -32,7 +32,6 @@ public class Lambdas01 {
                 new Person("name 1", "lastName 2", 40),
                 new Person("name 2", "lastName 1", 30)
         };
-
         Arrays.sort(persons, new Comparator<Person>() {
 
             @Override
@@ -40,7 +39,6 @@ public class Lambdas01 {
                 return o1.getLastName().compareTo(o2.getLastName());
             }
         });
-
         assertArrayEquals(new Person[]{
                 new Person("name 2", "lastName 1", 30),
                 new Person("name 1", "lastName 2", 40),
@@ -56,7 +54,6 @@ public class Lambdas01 {
                 new Person("name 2", "lastName 1", 30),
                 new Person("name 1", "lastName 3", 40)
         );
-
         Person person = null;
         for (Person p : persons) {
             if ("name 1".equals(p.getFirstName())) {
@@ -64,11 +61,9 @@ public class Lambdas01 {
                 break;
             }
         }
-
         if (person != null) {
             person.print();
         }
-
         assertNotNull(person);
         assertEquals(new Person("name 1", "lastName 2", 40), person);
     }
@@ -80,17 +75,15 @@ public class Lambdas01 {
                 new Person("name 1", "lastName 2", 40),
                 new Person("name 2", "lastName 1", 30)
         );
-
         final Optional<Person> personOptional =
                 FluentIterable.from(persons)
-                              .firstMatch(new Predicate<Person>() {
+                        .firstMatch(new Predicate<Person>() {
 
-                                  @Override
-                                  public boolean apply(Person p) {
-                                        return "name 1".equals(p.getFirstName());
-                                    }
-                              });
-
+                            @Override
+                            public boolean apply(Person p) {
+                                return "name 1".equals(p.getFirstName());
+                            }
+                        });
         if (personOptional.isPresent()) {
             personOptional.get().print();
             assertNotNull(personOptional.get());
@@ -105,17 +98,15 @@ public class Lambdas01 {
                 new Person("name 1", "lastName 2", 40),
                 new Person("name 2", "lastName 1", 30)
         );
-
         final Map<String, Person> personByLastName =
                 FluentIterable.from(persons)
-                              .uniqueIndex(new Function<Person, String>() {
-                                @Override
-                                public String apply(Person person) {
-                                    return person.getLastName();
-                                }
-                              });
+                        .uniqueIndex(new Function<Person, String>() {
+                            @Override
+                            public String apply(Person person) {
+                                return person.getLastName();
+                            }
+                        });
 
         assertEquals(personByLastName.get("lastName 3"), new Person("name 3", "lastName 3", 20));
     }
-
 }
