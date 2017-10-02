@@ -12,22 +12,20 @@ public class Lambdas04 {
 
     @Test
     public void closure() {
+        // effectively final
         Person person = new Person("John", "Galt", 33);
-
         run(new Runnable() {
             @Override
             public void run() {
                 person.print();
             }
         });
-
         //person = new Person("a", "a", 44);
     }
 
     @Test
     public void closure_lambda() {
         Person person = new Person("John", "Galt", 33);
-
         // statement lambda
         run(() -> {
             person.print();
@@ -47,14 +45,10 @@ public class Lambdas04 {
     @Test
     public void closure_this_lambda() {
         _person = new Person("John", "Galt", 33);
-
-        run(() -> /*this.*/_person.print());
-        run(/*this.*/_person::print);
-
+        run(() -> /*this.*/_person.print()); // GC Problems - замкнулись на this
+        run(/*this.*/_person::print);        // замкнулись на this _person
         _person = new Person("a", "a", 1);
-
     }
-
 
     private Runnable runLater(Runnable r) {
         return () -> {
@@ -63,20 +57,14 @@ public class Lambdas04 {
         };
     }
 
-
     @Test
     public void closure_this_lambda2() {
         _person = new Person("John", "Galt", 33);
-
         //final Person person = _person;
         final Runnable r1 = runLater(() -> _person.print());
         final Runnable r2 = runLater(get_person()::print);
-
         _person = new Person("a", "a", 1);
-
         r1.run();
         r2.run();
-
     }
-
 }

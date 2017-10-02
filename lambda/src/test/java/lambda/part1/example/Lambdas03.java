@@ -15,7 +15,7 @@ public class Lambdas03 {
         T sum(T a, T b);
 
         default T twice(T t) {
-            return sum(t,t);
+            return sum(t, t);
         }
     }
 
@@ -29,26 +29,26 @@ public class Lambdas03 {
                         return i1 + i2;
                     }
                 };
-
         assertEquals(sum.sum(1, 2), Integer.valueOf(3));
     }
 
     @Test
     public void generic1() {
+        // statement lambda
         final GenericSum<Integer> sum =
                 (Integer i1, Integer i2) -> {
                     System.out.print("before sum");
                     return i1 + i2;
                 };
-
         assertEquals(sum.sum(1, 2), Integer.valueOf(3));
     }
 
     @Test
     public void generic2() {
         final GenericSum<Integer> sum = (i1, i2) -> i1 + i2;
-
         assertEquals(sum.twice(1), Integer.valueOf(2));
+        assertEquals(sum.sum(1, 2), Integer.valueOf(3));
+
     }
 
     private static String stringSum(String s1, String s2) {
@@ -57,8 +57,8 @@ public class Lambdas03 {
 
     @Test
     public void strSum() {
+        // Class method-reference lambda
         final GenericSum<String> sum = Lambdas03::stringSum;
-
         assertEquals(sum.sum("a", "b"), "ab");
     }
 
@@ -70,9 +70,8 @@ public class Lambdas03 {
 
     @Test
     public void strSum2() {
+        // Object method-reference lambda
         final GenericSum<String> sum = this::stringSumWithDelimiter;
-
         assertEquals(sum.sum("a", "b"), "a-b");
     }
-
 }

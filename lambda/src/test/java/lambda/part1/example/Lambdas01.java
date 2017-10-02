@@ -73,7 +73,8 @@ public class Lambdas01 {
         List<Person> persons = ImmutableList.of(
                 new Person("name 3", "lastName 3", 20),
                 new Person("name 1", "lastName 2", 40),
-                new Person("name 2", "lastName 1", 30)
+                new Person("name 2", "lastName 1", 30),
+                new Person("name 1", "lastName 3", 40)
         );
         final Optional<Person> personOptional =
                 FluentIterable.from(persons)
@@ -106,7 +107,6 @@ public class Lambdas01 {
                                 return person.getLastName();
                             }
                         });
-
-        assertEquals(personByLastName.get("lastName 3"), new Person("name 3", "lastName 3", 20));
+        assertEquals(new Person("name 3", "lastName 3", 20), personByLastName.get("lastName 3"));
     }
 }
