@@ -45,6 +45,7 @@ public class Lambdas03 {
 
     @Test
     public void generic2() {
+        // expression lambda
         final GenericSum<Integer> sum = (i1, i2) -> i1 + i2;
         assertEquals(sum.twice(1), Integer.valueOf(2));
         assertEquals(sum.sum(1, 2), Integer.valueOf(3));

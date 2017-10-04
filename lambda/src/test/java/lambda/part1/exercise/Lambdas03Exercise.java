@@ -7,7 +7,6 @@ import java.util.StringJoiner;
 import static org.junit.Assert.assertEquals;
 
 public class Lambdas03Exercise {
-
     private interface GenericProduct<T> {
         T prod(T a, int i);
 
@@ -18,23 +17,31 @@ public class Lambdas03Exercise {
 
     @Test
     public void generic0() {
-        final GenericProduct<Integer> prod = null; // Use anonymous class
-
-        assertEquals(prod.prod(3, 2), Integer.valueOf(6));
+        // Use anonymous class
+        final GenericProduct<Integer> prod = new GenericProduct<Integer>() {
+            @Override
+            public Integer prod(Integer a, int i) {
+                return a * i;
+            }
+        };
+        assertEquals(Integer.valueOf(6), prod.prod(3, 2));
     }
 
     @Test
     public void generic1() {
-        final GenericProduct<Integer> prod = null; // Use statement lambda
-
-        assertEquals(prod.prod(3, 2), Integer.valueOf(6));
+        // Use statement lambda
+        final GenericProduct<Integer> prod = (Integer num, int i) -> {
+            System.out.println("sunny shining of statement lambda");
+            return num * i;
+        };
+        assertEquals(Integer.valueOf(6), prod.prod(3, 2));
     }
 
     @Test
     public void generic2() {
-        final GenericProduct<Integer> prod = null; // Use expression lambda
-
-        assertEquals(prod.prod(3, 2), Integer.valueOf(6));
+        // Use expression lambda
+        final GenericProduct<Integer> prod = (Integer num, int i) -> num * i;
+        assertEquals(Integer.valueOf(6), prod.prod(3, 2));
     }
 
     private static String stringProd(String s, int i) {
@@ -47,15 +54,15 @@ public class Lambdas03Exercise {
 
     @Test
     public void strSum() {
-        final GenericProduct<String> prod = null; // use stringProd;
-
-        assertEquals(prod.prod("a", 2), "aa");
+        // use stringProd :: class method-reference lambda
+        final GenericProduct<String> prod = Lambdas03Exercise::stringProd; // use stringProd;
+        assertEquals("aa", prod.prod("a", 2));
     }
 
-    private final String delimeter = "-";
+    private final String delimiter = "-";
 
-    private String stringSumWithDelimeter(String s, int i) {
-        final StringJoiner sj = new StringJoiner(delimeter);
+    private String stringSumWithDelimiter(String s, int i) {
+        final StringJoiner sj = new StringJoiner(delimiter);
         for (int j = 0; j < i; j++) {
             sj.add(s);
         }
@@ -64,10 +71,8 @@ public class Lambdas03Exercise {
 
     @Test
     public void strSum2() {
-        final GenericProduct<String> prod = null; // use stringSumWithDelimeter;
-
-        assertEquals(prod.prod("a", 3), "a-a-a");
+        // use stringSumWithDelimiter :: object method-reference lambda
+        final GenericProduct<String> prod = this::stringSumWithDelimiter;
+        assertEquals("a-a-a", prod.prod("a", 3));
     }
-
-
 }

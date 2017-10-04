@@ -24,6 +24,7 @@ public class Lambdas01Exercise {
                 new Person("name 1", "lastName 2", 40),
                 new Person("name 2", "lastName 1", 30)
         };
+        //  use Arrays.sort
         Arrays.sort(persons, new Comparator<Person>() {
             @Override
             public int compare(Person o1, Person o2) {
@@ -45,6 +46,7 @@ public class Lambdas01Exercise {
                 new Person("name 2", "lastName 1", 30)
         );
         Person person = null;
+        // use FluentIterable
         final Optional<Person> personOptional =
                 FluentIterable.from(persons).firstMatch(new Predicate<Person>() {
                     @Override

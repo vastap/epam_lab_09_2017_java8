@@ -33,7 +33,6 @@ public class Lambdas01 {
                 new Person("name 2", "lastName 1", 30)
         };
         Arrays.sort(persons, new Comparator<Person>() {
-
             @Override
             public int compare(Person o1, Person o2) {
                 return o1.getLastName().compareTo(o2.getLastName());

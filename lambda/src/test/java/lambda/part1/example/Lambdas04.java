@@ -48,8 +48,11 @@ public class Lambdas04 {
         run(() -> /*this.*/_person.print()); // GC Problems - замкнулись на this
         run(/*this.*/_person::print);        // замкнулись на this _person
         _person = new Person("a", "a", 1);
+        run(() -> /*this.*/_person.print()); // GC Problems - замкнулись на this
+        run(/*this.*/_person::print);        // замкнулись на this _person
     }
 
+    // подготавливаем лямбду, но run вызван не будет
     private Runnable runLater(Runnable r) {
         return () -> {
             System.out.println("before run");
@@ -61,8 +64,8 @@ public class Lambdas04 {
     public void closure_this_lambda2() {
         _person = new Person("John", "Galt", 33);
         //final Person person = _person;
-        final Runnable r1 = runLater(() -> _person.print());
-        final Runnable r2 = runLater(get_person()::print);
+        final Runnable r1 = runLater(() -> _person.print()); // замкнет на this, потом сменит значение перед run
+        final Runnable r2 = runLater(get_person()::print);   // замкнет на _person, потом НЕ сменит значение перед run
         _person = new Person("a", "a", 1);
         r1.run();
         r2.run();

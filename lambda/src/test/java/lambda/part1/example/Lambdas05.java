@@ -12,15 +12,16 @@ public class Lambdas05 {
     private <T> void printResult(T t, Function<T, String> f) {
         System.out.println(f.apply(t));
     }
-
     private final Person person = new Person("John", "Galt", 33);
 
     @Test
     public void printField() {
+        // person неявно (это реализовано в JAVA 8) выступает первым параметром в Function<T, String> (неявное this)
+        // именно объект person передается в виде this-объекта в getLastName
+        // функцию можно представить в виде public String getLastName(Person this) - т.е. туда передается this
+        // в данном случае в роли this выступает person, который является первым параметром printResult(...)
         printResult(person, Person::getLastName);
-
 //        BiFunction<Person, String, Person> changeFirstName = Person::withFirstName;
-
 //        printResult(changeFirstName.apply(person, "newName"), Person::getFirstName);
     }
 
@@ -30,7 +31,6 @@ public class Lambdas05 {
             return person.toString();
         }
     }
-
 
     @Test
     public void printStringRepresentation() {
@@ -43,7 +43,6 @@ public class Lambdas05 {
             //Thread.sleep(100);
             person.print();
         };
-
         r.run();
     }
 
