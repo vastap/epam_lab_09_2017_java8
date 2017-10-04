@@ -12,7 +12,7 @@ public class Lambdas04 {
 
     @Test
     public void closure() {
-        // effectively final
+        // effectively final - можно не объявлять как final переменную, которая используется в функц. прог с Java 8
         Person person = new Person("John", "Galt", 33);
         run(new Runnable() {
             @Override

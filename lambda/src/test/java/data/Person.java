@@ -1,8 +1,9 @@
 package data;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Person {
+public class Person implements Serializable {
     private final String firstName;
     private final String lastName;
     private final int age;
@@ -12,6 +13,11 @@ public class Person {
         this.lastName = lastName;
         this.age = age;
     }
+
+    // * фабричный метод, который заменяется лямбдой для конструктора
+//    public static Person createPerson(String firstName, String lastName, int age) {
+//        return new Person(firstName, lastName, age);
+//    }
 
     public String getFirstName() {
         return firstName;
