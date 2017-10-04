@@ -38,7 +38,7 @@ public class Lambdas04 {
 
     private Person _person = null;
 
-    public Person get_person() {
+    public Person getPerson() {
         return _person;
     }
 
@@ -65,9 +65,11 @@ public class Lambdas04 {
         _person = new Person("John", "Galt", 33);
         //final Person person = _person;
         final Runnable r1 = runLater(() -> _person.print()); // замкнет на this, потом сменит значение перед run
-        final Runnable r2 = runLater(get_person()::print);   // замкнет на _person, потом НЕ сменит значение перед run
+        final Runnable r2 = runLater(getPerson()::print);    // замкнет на _person, потом НЕ сменит значение перед run
+        Runnable r3 = runLater(this.getPerson()::print);     // можно без final обходиться, будет тоже самое, что и в прошл стр.
         _person = new Person("a", "a", 1);
         r1.run();
         r2.run();
+        r3.run();
     }
 }

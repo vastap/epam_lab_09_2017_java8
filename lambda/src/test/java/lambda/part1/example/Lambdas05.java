@@ -21,6 +21,13 @@ public class Lambdas05 {
         // функцию можно представить в виде public String getLastName(Person this) - т.е. туда передается this
         // в данном случае в роли this выступает person, который является первым параметром printResult(...)
         printResult(person, Person::getLastName);
+        // тоже самое развернуто:
+//        printResult(person, new Function<Person, String>() {
+//            @Override
+//            public String apply(Person person) {
+//                return person.getLastName();
+//            }
+//        });
 //        BiFunction<Person, String, Person> changeFirstName = Person::withFirstName;
 //        printResult(changeFirstName.apply(person, "newName"), Person::getFirstName);
     }
