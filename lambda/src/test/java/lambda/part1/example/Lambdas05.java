@@ -71,6 +71,11 @@ public class Lambdas05 {
         //conflict(this::printAndReturn);
     }
 
+    @Test
+    public void serializeTree() {
+
+    }
+
     private interface PersonFactory {
         Person create(String name, String lastName, int age);
     }
