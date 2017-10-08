@@ -38,8 +38,6 @@ public class Lambdas02Exercise {
                 new Person("name 2", "lastName 1", 30)
         );
 
-        Person person = null;
-
         Optional<Person> personOptional = FluentIterable.from(persons)
                                         .firstMatch(p -> p.getAge() == 30);
 
