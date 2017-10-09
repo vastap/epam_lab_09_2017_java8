@@ -159,7 +159,7 @@ public class Filtering {
 
         public List<T> force() {
             if (condition == null) {
-                return list;
+                return list; // хорошо бы вернуть копию листа, а не его сам
             }
 
             return new FilterUtil<>(list).filter(condition).getList();
