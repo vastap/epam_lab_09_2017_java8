@@ -3,7 +3,7 @@ package data;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class Person implements Serializable {
+public class Person implements Comparable<Person>, Serializable {
     private final String firstName;
     private final String lastName;
     private final int age;
@@ -77,5 +77,10 @@ public class Person implements Serializable {
                 ", lastName='" + lastName + '\'' +
                 ", age=" + age +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Person o) {
+        return Integer.compare(age, o.age);
     }
 }

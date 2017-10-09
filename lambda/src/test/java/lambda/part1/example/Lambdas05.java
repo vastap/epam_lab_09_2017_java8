@@ -89,12 +89,6 @@ public class Lambdas05 {
         conflict((Runnable) this::printAndReturn);
     }
 
-    class ComparatorPersons implements Comparator<Person>, Serializable {
-        public int compare(Person o1, Person o2) {
-            return o1.getAge() - o2.getAge();
-        }
-    }
-
     @Test
     public void serializeTree() {
         //падаем, компаратор не сериалайзбл
@@ -105,9 +99,9 @@ public class Lambdas05 {
 //            }
 //        });
         // падаем, поляснения ЗАВТРА
-        //Set<Person> treeSet = new TreeSet<>(new ComparatorPersons());
+        Set<Person> treeSet = new TreeSet<>(new ComparatorPersons());
         // можно добавить маркерный интерфейс к интерфейсу, который формирует лямбду
-        Set<Person> treeSet = new TreeSet<>((Comparator<Person> & Serializable) (o1, o2) -> o1.getAge() - o2.getAge());
+        //Set<Person> treeSet = new TreeSet<>((Comparator<Person> & Serializable) (o1, o2) -> o1.getAge() - o2.getAge());
         treeSet.add(new Person("b", "b", 2));
         treeSet.add(new Person("a", "a", 1));
         treeSet.add(new Person("c", "c", 3));
@@ -136,5 +130,12 @@ public class Lambdas05 {
         // * фабричный метод createPerson в Person, который заменяется лямбдой для конструктора
         // constructor-reference lambda
         withFactory(Person::new);
+    }
+}
+
+// вынесли класс, т.к. внутр класс нестатический нельзя сериализовать если внешний не сериализуемый
+class ComparatorPersons implements Comparator<Person>, Serializable {
+    public int compare(Person o1, Person o2) {
+        return o1.getAge() - o2.getAge();
     }
 }

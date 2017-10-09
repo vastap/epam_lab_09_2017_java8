@@ -67,7 +67,7 @@ public class ArrowNotation {
 
     @Test
     public void checkProperty2() {
-        Function<Person, Predicate<String>> ageChecker = propertyChecker2(person1 -> String.valueOf(person1.getAge()));
+        Function<Person, Predicate<String>> ageChecker = propertyChecker2(person -> String.valueOf(person.getAge()));
         Function<Person, Predicate<String>> lastNameChecker = propertyChecker2(Person::getLastName);
         Person person = new Person("a", "b", 33);
         assertTrue(lastNameChecker.apply(person).test("b"));
@@ -84,7 +84,7 @@ public class ArrowNotation {
         // String -> boolean
         Predicate<String> checkFirstName = propertyChecker(person, getFirstName);
         assertTrue(checkFirstName.test("a"));
-        // anti hype
+        // nice style
         assertTrue(propertyChecker(new Person("a", "b", 25), Person::getFirstName).test("a"));
     }
 }

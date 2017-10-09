@@ -14,19 +14,24 @@ public class FunctionCombination {
     public void personToInt0() {
         // Person -> Integer
         Function<Person, Integer> lastNameLength = p -> p.getLastName().length();
-
         assertEquals(5, lastNameLength.apply(new Person("a", "abcde", 0)).intValue());
     }
 
     // (Person -> String, String -> Integer) -> (Person -> Integer)
+//    private Function<Person, Integer> personStringPropertyToInt(
+//            Function<Person, String> personToString,
+//            Function<String, Integer> stringToInteger) {
+//        return p -> {
+//            String str = personToString.apply(p);
+//            Integer result = stringToInteger.apply(str);
+//            return result;
+//        };
+//    }
+
     private Function<Person, Integer> personStringPropertyToInt(
             Function<Person, String> personToString,
             Function<String, Integer> stringToInteger) {
-        return p -> {
-            String str = personToString.apply(p);
-            Integer result = stringToInteger.apply(str);
-            return result;
-        };
+        return p -> stringToInteger.apply(personToString.apply(p));
     }
 
     @Test
@@ -34,7 +39,6 @@ public class FunctionCombination {
         Function<Person, String> getLastName = Person::getLastName;
         Function<String, Integer> getLength = String::length;
         Function<Person, Integer> lastNameLength = personStringPropertyToInt(getLastName, getLength);
-
         assertEquals(5, lastNameLength.apply(new Person("a", "abcde", 0)).intValue());
     }
 
@@ -48,8 +52,15 @@ public class FunctionCombination {
         Function<Person, String> getLastName = Person::getLastName;
         Function<String, Integer> getLength = String::length;
         Function<Person, Integer> lastNameLength = andThen(getLastName, getLength);
-
         assertEquals(5, lastNameLength.apply(new Person("a", "abcde", 0)).intValue());
+    }
+
+    static class MyClass {
+
+    }
+
+    static class InheritedMyClass extends MyClass {
+
     }
 
     @Test
@@ -57,7 +68,6 @@ public class FunctionCombination {
         Function<Person, String> getLastName = Person::getLastName;
         Function<String, Integer> getLength = String::length;
         Function<Person, Integer> lastNameLength = getLastName.andThen(getLength);
-
         assertEquals(5, lastNameLength.apply(new Person("a", "abcde", 0)).intValue());
     }
 }
