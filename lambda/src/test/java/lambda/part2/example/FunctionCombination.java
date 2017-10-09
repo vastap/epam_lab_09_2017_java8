@@ -3,7 +3,10 @@ package lambda.part2.example;
 import data.Person;
 import org.junit.Test;
 
+import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.IntFunction;
+import java.util.function.IntUnaryOperator;
 
 import static org.junit.Assert.assertEquals;
 
@@ -69,5 +72,21 @@ public class FunctionCombination {
         Function<String, Integer> getLength = String::length;
         Function<Person, Integer> lastNameLength = getLastName.andThen(getLength);
         assertEquals(5, lastNameLength.apply(new Person("a", "abcde", 0)).intValue());
+    }
+
+    public int sum(int x, int y, int z) {
+        return x + y + z;
+    }
+
+    // same: public static Function<Integer, Function<Integer, Function<Integer, Integer>>> curry()
+    public Function<Integer, IntFunction<IntUnaryOperator>> currySum() {
+        return x -> y -> z -> sum(x, y, z);
+    }
+
+    public void method() {
+        Object a = null;
+        Object b = null;
+        boolean eq = a != null ? a.equals(b) : b == null;
+        boolean equ = Objects.equals(a, b);
     }
 }

@@ -83,7 +83,6 @@ public class Filtering {
                     res.add(t);
                 }
             }
-
             return new FilterUtil<T>(res);
         }
     }
@@ -132,16 +131,14 @@ public class Filtering {
                                         new JobHistoryEntry(5, "QA", "epam")
                                 ))
                 );
-
         final FilterUtil<Employee> johns = new FilterUtil<>(employees)
                 .filter(e -> e.getPerson().getFirstName().equals("John"));
         final List<Employee> filteredList = johns
                 .filter(Filtering::hasDevExperience)
                 .filter(Filtering::workedInEpamMoreThenOneYear)
                 .getList();
-
-        assertEquals(filteredList.size(), 1);
-        assertEquals(filteredList.get(0).getPerson(), new Person("John", "Galt", 30));
+        assertEquals(1, filteredList.size());
+        assertEquals(new Person("John", "Galt", 30), filteredList.get(0).getPerson());
     }
 
     public static class LazyFilterUtil<T> {
@@ -174,7 +171,6 @@ public class Filtering {
             if (c1 == null) {
                 return c2;
             }
-
             return c1.and(c2);
         }
     }
@@ -186,7 +182,6 @@ public class Filtering {
                 .force()
                 .size() > 0;
     }
-
 
     @Test
     public void lazy_filtering() {
@@ -211,15 +206,12 @@ public class Filtering {
                                         new JobHistoryEntry(5, "QA", "epam")
                                 ))
                 );
-
         final List<Employee> filteredList = new LazyFilterUtil<>(employees)
                 .filter(e -> e.getPerson().getFirstName().equals("John"))
                 .filter(Filtering::hasDevExperience)
                 .filter(Filtering::workedInEpamMoreThenOneYearLazy)
                 .force();
-
-        assertEquals(filteredList.size(), 1);
-        assertEquals(filteredList.get(0).getPerson(), new Person("John", "Galt", 30));
+        assertEquals(1, filteredList.size());
+        assertEquals(new Person("John", "Galt", 30), filteredList.get(0).getPerson());
     }
-
 }
