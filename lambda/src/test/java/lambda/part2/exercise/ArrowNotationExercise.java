@@ -1,7 +1,6 @@
 package lambda.part2.exercise;
 
 import data.Person;
-import lambda.part2.example.FunctionCombination;
 import org.junit.Test;
 
 import java.util.function.BiFunction;
