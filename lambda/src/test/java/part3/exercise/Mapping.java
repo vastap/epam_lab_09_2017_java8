@@ -32,8 +32,12 @@ public class Mapping {
         // [T] -> (T -> R) -> [R]
         // [T1, T2, T3] -> (T -> R) -> [R1, R2, R3]
         public <R> MapHelper<R> map(Function<T, R> f) {
-            // TODO
-            throw new UnsupportedOperationException();
+            final List<R> result = new ArrayList<>();
+            for (T t : list) {
+                result.add(f.apply(t));
+            }
+
+            return new MapHelper<R>(result);
         }
 
         // [T] -> (T -> [R]) -> [R]
