@@ -29,7 +29,7 @@ public class StreamsExercise2 {
                 .flatMap(e -> e.getJobHistory().stream()
                         .collect(Collectors.toMap(JobHistoryEntry::getEmployer,
                                 (x) -> e.getPerson())).entrySet()
-                        .stream())
+                        .stream()).distinct()
                 .collect(Collectors.groupingBy(Map.Entry::getKey,
                         Collectors.mapping(Map.Entry::getValue, Collectors.toList())));// TODO
         System.out.println(employersStuffLists);
