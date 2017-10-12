@@ -84,8 +84,10 @@ public class StreamsExample {
                 .filter(e -> e.getPerson().getAge() >= 25)
                 .flatMap(e -> e.getJobHistory().stream())
                 .filter(e -> e.getPosition().equals("dev"))
+                .filter(e -> e.getDuration() % 2 != 0)
                 .distinct()
-                .sorted(comparing(JobHistoryEntry::getDuration))
+//                 .sorted(Comparator.comparing(JobHistoryEntry::getDuration))
+                .sorted(Comparator.comparingInt(JobHistoryEntry::getDuration))
                 .forEachOrdered(System.out::println);
     }
 
@@ -112,12 +114,16 @@ public class StreamsExample {
     }
 
     // [ (John, [dev, QA]), (Bob, [QA, QA])] -> [dev -> [John], QA -> [John, Bob]]
-    // [ (John, dev), (John, QA), (Bob, QA), (Bob, QA)]
+    // [ (John, dev), (John, QA), (Bob, QA), (Bob, QA)] -> [dev -> [John], QA -> [John, Bob]]
     private Map<String, Set<Person>> getPositionIndex(List<Employee> employees) {
         Stream<PersonPositionPair> personPositionPairStream = employees.stream().flatMap(StreamsExample::employeeToPairs);
 
-        //personPositionPairStream
-        //        .reduce(Collections.EMPTY_MAP, StreamsExample::addToMap, StreamsExample::combineMaps);
+        // Reduce with seed
+        // у reduce 3 параметра тут: 1 - куда все складывается, 2 - как элементы добавляются в коллекцию
+        // 3 параметр - это такая функция, которая может склеить две коллекции первого типа, нужно для того,
+        // чтобы можно было распараллелить вычисления
+        personPositionPairStream
+                .reduce(Collections.emptyMap(), StreamsExample::addToMap, StreamsExample::combineMaps);
 
 //        return personPositionPairStream
 //                .collect(
@@ -137,26 +143,48 @@ public class StreamsExample {
 
     }
 
-/*    private static Map<String, Set<Person>> combineMaps(Map<String, Set<Person>> u1,
-                                                        Map<String, Set<Person>> u2) {
-        final HashMap<String, Set<Person>> result = new HashMap<>();
-        result.putAll(u1);
-        for (Map.Entry<String, Set<Person>> entry : u2.entrySet()) {
-            Set<Person> set = result.computeIfAbsent(entry.getKey(), (k) -> new HashSet<>());
-            set.addAll(entry.getValue());
-        }
+    private static Map<String, Set<Person>> combineMaps(Map<String, Set<Person>> u1, Map<String, Set<Person>> u2) {
+        Map<String, Set<Person>> result = new HashMap<>(u1);
+        u2.forEach((key, value) -> result.merge(key, new HashSet<>(value), (old, ne) -> {
+            old.addAll(value);
+            return old;
+        }));
         return result;
+//      Старое решение:
+//        final HashMap<String, Set<Person>> result = new HashMap<>();
+//        result.putAll(u1);
+//        for (Map.Entry<String, Set<Person>> entry : u2.entrySet()) {
+//            Set<Person> set = result.computeIfAbsent(entry.getKey(), (k) -> new HashSet<>());
+//            set.addAll(entry.getValue());
+//        }
+//        return result;
     }
 
-    private static Map<String, Set<Person>> addToMap(
-            Map<String, Set<Person>> u,
-            PersonPositionPair personPositionPair) {
-        final HashMap<String, Set<Person>> result = new HashMap<>();
-        result.putAll(u);
-        Set<Person> set = result.computeIfAbsent(personPositionPair.getPosition(), (k) -> new HashSet<>());
-        set.add(personPositionPair.getPerson());
+    private static Map<String, Set<Person>> addToMap(Map<String, Set<Person>> origin, PersonPositionPair pair) {
+        Map<String, Set<Person>> result = new HashMap<>(origin);
+        result.merge(pair.getPosition(), Collections.singleton(pair.getPerson()), (oldValue, newValue) -> {
+            oldValue.add(pair.getPerson());
+            return oldValue;
+        });
         return result;
-    }*/
+//        Старое решение:
+//        final HashMap<String, Set<Person>> result = new HashMap<>();
+//        result.putAll(origin);
+//        Set<Person> set = result.computeIfAbsent(pair.getPosition(), (k) -> new HashSet<>());
+//        set.add(pair.getPerson());
+//        return result;
+
+//        Для понимания типа:
+//        Map<String, Integer> someMap = new HashMap<>();
+//        someMap.put("1", 1);
+//        someMap.put("2", 2);
+//        someMap.put("3", 3);
+//        someMap.put("4", 4);
+//
+//
+//        someMap.put("2", 10);
+//        someMap.merge("2", 10, Integer::sum);
+    }
 
 
     @Test
@@ -363,5 +391,4 @@ public class StreamsExample {
             return position;
         }
     }
-
 }
