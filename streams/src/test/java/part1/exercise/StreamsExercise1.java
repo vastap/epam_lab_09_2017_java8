@@ -6,6 +6,8 @@ import data.Person;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,7 +37,11 @@ public class StreamsExercise1 {
                         new JobHistoryEntry(2, "dev", "google")
         )));
 
-        List<Person> epamEmployees = null;// TODO all persons with experience in epam
+        List<Person> epamEmployees = employees.stream()
+                .filter(e-> e.getJobHistory().stream()
+                        .anyMatch(x-> "epam".equals(x.getEmployer())))
+                .map(Employee::getPerson)
+                .collect(Collectors.toList());// TODO all persons with experience in epam
 
         assertEquals(Arrays.asList(
                 new Person("John", "Galt", 20),
@@ -68,7 +74,11 @@ public class StreamsExercise1 {
                                 new JobHistoryEntry(2, "dev", "google")
                         )));
 
-        List<Person> epamEmployees = null;// TODO all persons with first experience in epam
+        List<Person> epamEmployees = employees.stream()
+                .filter(e-> e.getJobHistory().stream().limit(1)
+                        .anyMatch(x-> "epam".equals(x.getEmployer())))
+                .map(Employee::getPerson)
+                .collect(Collectors.toList());// TODO all persons with first experience in epam
 
         assertEquals(Arrays.asList(
                 new Person("John", "Galt", 20),
@@ -101,7 +111,12 @@ public class StreamsExercise1 {
         )));
 
 
-        int result = 0; // TODO sum
+        int result = employees.stream()
+                .mapToInt(e-> e.getJobHistory().stream()
+                        .filter(x-> "epam".equals(x.getEmployer()))
+                        .mapToInt(JobHistoryEntry::getDuration)
+                        .sum())
+                .sum(); // TODO sum
         assertEquals(11, result);
     }
 

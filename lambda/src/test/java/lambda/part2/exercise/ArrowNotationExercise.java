@@ -15,7 +15,6 @@ public class ArrowNotationExercise {
     public void getAge() {
         // Person -> Integer
         final Function<Person, Integer> getAge = Person::getAge; // TODO
-
         assertEquals(Integer.valueOf(33), getAge.apply(new Person("", "", 33)));
     }
 
@@ -31,7 +30,7 @@ public class ArrowNotationExercise {
 
     // TODO
     // getFullName: Person -> String
-    final Function<Person,String> getFullName =(x)-> x.getFirstName() +" "+ x.getLastName();
+//    final Function<Person,String> getFullName =(x)-> x.getFirstName() +" "+ x.getLastName();
 
     // TODO
     // ageOfPersonWithTheLongestFullName: (Person -> String) -> (Person, Person) -> int
