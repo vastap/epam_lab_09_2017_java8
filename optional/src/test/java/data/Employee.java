@@ -3,7 +3,6 @@ package data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Employee {
     private final Person person;
@@ -11,7 +10,6 @@ public class Employee {
 
     public Employee(Person person, List<JobHistoryEntry> jobHistory) {
         this.person = person;
-        Optional
         this.jobHistory = jobHistory;
     }
 
@@ -51,5 +49,4 @@ public class Employee {
     public int hashCode() {
         return Objects.hash(person, jobHistory);
     }
-
 }
