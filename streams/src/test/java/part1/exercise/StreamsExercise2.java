@@ -5,10 +5,8 @@ import data.JobHistoryEntry;
 import data.Person;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static data.Generator.generateEmployeeList;
@@ -26,13 +24,55 @@ public class StreamsExercise2 {
 
     @Test
     public void employersStuffLists() {
-        Map<String, List<Person>> employersStuffLists = null;// TODO
+        Map<String, List<Person>> employersStuffLists =
+                getEmployees().stream()
+                .flatMap(e -> e.getJobHistory().stream()
+                        .collect(Collectors.toMap(JobHistoryEntry::getEmployer,
+                                (x) -> e.getPerson())).entrySet()
+                        .stream())
+                .collect(Collectors.groupingBy(Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));// TODO
+        System.out.println(employersStuffLists);
+
+//     in employersStuffLists:
+//          {abc=
+//            [Person-2068529915:{firstName='John', lastName='Doe', age=21},
+//            Person-2068529912:{firstName='John', lastName='Doe', age=24},
+//            Person66518773:{firstName='Bob', lastName='Doe', age=27},
+//            Person-2068529906:{firstName='John', lastName='Doe', age=30}],
+//            yandex=
+//            [Person-2068529915:{firstName='John', lastName='Doe', age=21},
+//            Person-2068529912:{firstName='John', lastName='Doe', age=24},
+//            Person66518773:{firstName='Bob', lastName='Doe', age=27},
+//            Person-2068529906:{firstName='John', lastName='Doe', age=30}],
+//            epam=
+//            [Person-2002098404:{firstName='John', lastName='Galt', age=20},
+//            Person-2068529915:{firstName='John', lastName='Doe', age=21},
+//            Person519359479:{firstName='John', lastName='White', age=22},
+//            Person-2002098401:{firstName='John', lastName='Galt', age=23},
+//            Person-2068529912:{firstName='John', lastName='Doe', age=24},
+//            Person519359482:{firstName='John', lastName='White', age=25},
+//            Person-2002098398:{firstName='John', lastName='Galt', age=26},
+//            Person66518773:{firstName='Bob', lastName='Doe', age=27},
+//            Person519359485:{firstName='John', lastName='White', age=28},
+//            Person-2002098395:{firstName='John', lastName='Galt', age=29},
+//            Person-2068529906:{firstName='John', lastName='Doe', age=30},
+//            Person-1640559126:{firstName='Bob', lastName='White', age=31}],
+//            google=
+//            [Person-2002098404:{firstName='John', lastName='Galt', age=20},
+//            Person-2002098401:{firstName='John', lastName='Galt', age=23},
+//            Person-2002098398:{firstName='John', lastName='Galt', age=26},
+//            Person-2002098395:{firstName='John', lastName='Galt', age=29}]}
+
         throw new UnsupportedOperationException();
     }
 
     @Test
     public void indexByFirstEmployer() {
-        Map<String, List<Person>> employeesIndex = null;// TODO
+        Map<String, List<Person>> employeesIndex = null;
+
+
+
         throw new UnsupportedOperationException();
     }
 
