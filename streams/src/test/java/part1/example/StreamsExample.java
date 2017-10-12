@@ -18,12 +18,12 @@ public class StreamsExample {
     @Test
     public void checkJohnsLastNames() {
         List<String> johnsLastNames = getEmployees().stream()
-                                                    .map(Employee::getPerson)
-                                                    .filter(e -> e.getFirstName().equals("John"))
-                                                    .map(Person::getLastName)
-                                                    .distinct()
-                                                    .collect(toList());
-
+                .map(Employee::getPerson)
+                .filter(e -> e.getFirstName().equals("John"))
+                .map(Person::getLastName)
+                .distinct()         // интермидиат операции
+                .collect(toList()); // терминальные операции - типа форсим) - только одна в конце
+        // .toArray(String[]:new) = .toArray(size -> new String[size])
         assertEquals(Collections.singletonList("Galt"), johnsLastNames);
     }
 
@@ -31,23 +31,24 @@ public class StreamsExample {
     public void operations() {
         Optional<JobHistoryEntry> jobHistoryEntry =
                 getEmployees().stream()
-                              .filter(e -> e.getPerson().getFirstName().equals("John"))
-                              .map(Employee::getJobHistory)
-                              .flatMap(Collection::stream)
-                              .peek(System.out::println)
-                              .distinct()
-                              .sorted(comparing(JobHistoryEntry::getDuration))
-                              .skip(1) // long
-                              .limit(10) // long
-                              .unordered()
-                              .parallel()
-                              .sequential()
-                              .findAny();
-        //      .allMatch(Predicate<T>)
-        //      .anyMatch(Predicate<T>)
-        //      .noneMatch(Predicate<T>)
-        //      .reduce(BinaryOperator<T>) // ассоциативная операция
-        //      .collect(Collector<T, A, R>)
+                        .filter(e -> e.getPerson().getFirstName().equals("John"))
+                        .map(Employee::getJobHistory)
+                        .flatMap(Collection::stream)
+                        .peek(System.out::println) // перебрать все элементы и куда-то деть все, не рекомендуется пользоваться им
+                        .distinct()
+                        .sorted(comparing(JobHistoryEntry::getDuration))
+                        .skip(1)          // long
+                        .limit(10)        // long
+                        .unordered()      // можно не сохранять порядок
+                        .parallel()       // можно вычислять операцию параллельно (chunks)
+                        .sequential()     // обратное parallel - последовательно все делать
+                        .findAny();       // взять любой элемент
+        //      Терминальные операции
+        //      .allMatch(Predicate<T>)         // все совпадения, заканчивается, когда закончится стрим, либо false
+        //      .anyMatch(Predicate<T>)         // boolean хотя бы один элемент
+        //      .noneMatch(Predicate<T>)        // boolean ни одного подходящего
+        //      .reduce(BinaryOperator<T>)      // коммутативная операция
+        //      .collect(Collector<T, A, R>)    //
         //      .count()
         //      .findAny()
         //      .findFirst()
@@ -56,17 +57,17 @@ public class StreamsExample {
         //      .max()
         //      .min()
         //      .toArray(IntFunction<A[]>)
-        //      .iterator()
+        //      .iterator()                     // если используем итератор, то поток надо закрыть с помощью close() или в try-with-res
 
         // Characteristic :
-        // CONCURRENT
-        // DISTINCT
-        // IMMUTABLE
-        // NONNULL
-        // ORDERED
-        // SIZED
-        // SORTED
-        // SUBSIZED
+        // CONCURRENT   -- parallel() true || sequential() false
+        // DISTINCT     -- где исходный ресурс гарантирует уникальность
+        // IMMUTABLE    -- по дефолту true
+        // NONNULL      --
+        // ORDERED      --
+        // SIZED        --
+        // SORTED       --
+        // SUBSIZED     --
 
 
         System.out.println(jobHistoryEntry);
@@ -79,13 +80,13 @@ public class StreamsExample {
         // Every aged (>= 25) John has an odd "dev" job experience
 
         employees.stream()
-                 .filter(e -> e.getPerson().getFirstName().equals("John"))
-                 .filter(e -> e.getPerson().getAge() >= 25)
-                 .flatMap(e -> e.getJobHistory().stream())
-                 .filter(e -> e.getPosition().equals("dev"))
-                 .distinct()
-                 .sorted(comparing(JobHistoryEntry::getDuration))
-                 .forEachOrdered(System.out::println);
+                .filter(e -> e.getPerson().getFirstName().equals("John"))
+                .filter(e -> e.getPerson().getAge() >= 25)
+                .flatMap(e -> e.getJobHistory().stream())
+                .filter(e -> e.getPosition().equals("dev"))
+                .distinct()
+                .sorted(comparing(JobHistoryEntry::getDuration))
+                .forEachOrdered(System.out::println);
     }
 
     @Test
@@ -105,9 +106,9 @@ public class StreamsExample {
 
     private static Stream<PersonPositionPair> employeeToPairs(Employee employee) {
         return employee.getJobHistory()
-                       .stream()
-                       .map(JobHistoryEntry::getPosition)
-                       .map(p -> new PersonPositionPair(employee.getPerson(), p));
+                .stream()
+                .map(JobHistoryEntry::getPosition)
+                .map(p -> new PersonPositionPair(employee.getPerson(), p));
     }
 
     // [ (John, [dev, QA]), (Bob, [QA, QA])] -> [dev -> [John], QA -> [John, Bob]]
