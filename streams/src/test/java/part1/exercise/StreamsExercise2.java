@@ -3,6 +3,7 @@ package part1.exercise;
 import data.Employee;
 import data.JobHistoryEntry;
 import data.Person;
+import jdk.nashorn.internal.objects.annotations.Function;
 import org.junit.Test;
 
 import java.util.*;
@@ -27,62 +28,72 @@ public class StreamsExercise2 {
         Map<String, List<Person>> employersStuffLists =
                 getEmployees().stream()
                 .flatMap(e -> e.getJobHistory().stream()
-                        .collect(Collectors.toMap(JobHistoryEntry::getEmployer,
-                                (x) -> e.getPerson())).entrySet()
-                        .stream()).distinct()
-                .collect(Collectors.groupingBy(Map.Entry::getKey,
-                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));// TODO
+                        .collect(toMap(JobHistoryEntry::getEmployer,
+                                (x) -> e.getPerson(), (x, y)-> x)).entrySet()
+                        .stream())
+                .collect(groupingBy(Map.Entry::getKey,
+                        mapping(Map.Entry::getValue, toList())));// TODO
         System.out.println(employersStuffLists);
-
-//     in employersStuffLists:
-//          {abc=
-//            [Person-2068529915:{firstName='John', lastName='Doe', age=21},
-//            Person-2068529912:{firstName='John', lastName='Doe', age=24},
-//            Person66518773:{firstName='Bob', lastName='Doe', age=27},
-//            Person-2068529906:{firstName='John', lastName='Doe', age=30}],
-//            yandex=
-//            [Person-2068529915:{firstName='John', lastName='Doe', age=21},
-//            Person-2068529912:{firstName='John', lastName='Doe', age=24},
-//            Person66518773:{firstName='Bob', lastName='Doe', age=27},
-//            Person-2068529906:{firstName='John', lastName='Doe', age=30}],
-//            epam=
-//            [Person-2002098404:{firstName='John', lastName='Galt', age=20},
-//            Person-2068529915:{firstName='John', lastName='Doe', age=21},
-//            Person519359479:{firstName='John', lastName='White', age=22},
-//            Person-2002098401:{firstName='John', lastName='Galt', age=23},
-//            Person-2068529912:{firstName='John', lastName='Doe', age=24},
-//            Person519359482:{firstName='John', lastName='White', age=25},
-//            Person-2002098398:{firstName='John', lastName='Galt', age=26},
-//            Person66518773:{firstName='Bob', lastName='Doe', age=27},
-//            Person519359485:{firstName='John', lastName='White', age=28},
-//            Person-2002098395:{firstName='John', lastName='Galt', age=29},
-//            Person-2068529906:{firstName='John', lastName='Doe', age=30},
-//            Person-1640559126:{firstName='Bob', lastName='White', age=31}],
-//            google=
-//            [Person-2002098404:{firstName='John', lastName='Galt', age=20},
-//            Person-2002098401:{firstName='John', lastName='Galt', age=23},
-//            Person-2002098398:{firstName='John', lastName='Galt', age=26},
-//            Person-2002098395:{firstName='John', lastName='Galt', age=29}]}
 
         throw new UnsupportedOperationException();
     }
 
     @Test
     public void indexByFirstEmployer() {
-        Map<String, List<Person>> employeesIndex = null;
+        Map<String, List<Person>> employeesIndex =
+                getEmployees().stream()
+                .flatMap(e -> e.getJobHistory().stream().limit(1)
+                        .collect(toMap(JobHistoryEntry::getEmployer,
+                                (x) -> e.getPerson(), (x, y)-> x)).entrySet()
+                        .stream().peek(System.out::println))
+                .collect(groupingBy(Map.Entry::getKey,
+                        mapping(Map.Entry::getValue, toList())));
+        System.out.println(employeesIndex);
 
 
-
-        throw new UnsupportedOperationException();
+//        throw new UnsupportedOperationException();
     }
 
     @Test
     public void greatestExperiencePerEmployer() {
-        Map<String, Person> employeesIndex = null;// TODO
+        Map<String, Person> employeesIndex =
+                getEmployees().stream().flatMap(e->
+                        e.getJobHistory().stream().collect(groupingBy(JobHistoryEntry::getEmployer,
+                                        summingInt(JobHistoryEntry::getDuration)))
+                                .entrySet().stream()
+                                .map((jhe)->new Triple(e.getPerson(),jhe.getKey(),jhe.getValue()))
+                        ).collect(groupingBy(Triple::getEmployer,
+                        collectingAndThen(Collectors.maxBy(Comparator.comparing(Triple::getDuration)), (x)-> x.get().getPerson())));
+
 
         assertEquals(new Person("John", "White", 28), employeesIndex.get("epam"));
     }
 
+    class Triple {
+        final Person person;
+        final String employer;
+        final int duration;
+
+        public Triple(Person person, String employer, int duration) {
+            this.person = person;
+            this.employer = employer;
+            this.duration = duration;
+        }
+
+        public Person getPerson() {
+            return person;
+        }
+
+        public String getEmployer() {
+            return employer;
+        }
+
+        public int getDuration() {
+            return duration;
+        }
+
+        public Triple changeDuration(int newDur){return new Triple(person,employer, newDur); }
+    }
 
     private List<Employee> getEmployees() {
         return Arrays.asList(
