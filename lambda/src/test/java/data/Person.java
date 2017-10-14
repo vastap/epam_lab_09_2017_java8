@@ -15,9 +15,9 @@ public class Person implements Comparable<Person>, Serializable {
     }
 
     // * фабричный метод, который заменяется лямбдой для конструктора
-//    public static Person createPerson(String firstName, String lastName, int age) {
-//        return new Person(firstName, lastName, age);
-//    }
+    public static Person create(String firstName, String lastName, int age) {
+        return new Person(firstName, lastName, age);
+    }
 
     public String getFirstName() {
         return firstName;
