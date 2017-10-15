@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -21,6 +22,7 @@ public class Lambdas01Exercise {
                 new Person("name 2", "lastName 1", 30)
         };
 
+        Arrays.sort(persons, Comparator.comparingInt(Person::getAge));
         // TODO use Arrays.sort
 
         assertArrayEquals(persons, new Person[]{
@@ -38,8 +40,8 @@ public class Lambdas01Exercise {
                 new Person("name 2", "lastName 1", 30)
         );
 
-        Person person = null;
-
+        Optional<Person> p = persons.stream().filter((x)-> x.getAge() == 30).findFirst();
+        Person person = p.orElse(null);
         // TODO use FluentIterable
 
         assertEquals(person, new Person("name 1", "lastName 2", 30));

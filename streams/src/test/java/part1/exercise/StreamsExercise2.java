@@ -6,7 +6,12 @@ import data.Person;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.*;
 
+import static data.Generator.generateEmployeeList;
+import static java.util.stream.Collectors.*;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -68,7 +73,13 @@ public class StreamsExercise2 {
     @Test
     public void employersStuffList() {
         List<Employee> employees = getEmployees();
-        Map<String, Set<Person>> result = null; // TODO
+        Map<String, Set<Person>> result =  getEmployees().stream()
+                .flatMap(e -> e.getJobHistory().stream()
+                        .collect(toMap(JobHistoryEntry::getEmployer,
+                                (x) -> e.getPerson(), (x, y)-> x)).entrySet()
+                        .stream())
+                .collect(groupingBy(Map.Entry::getKey,
+                        mapping(Map.Entry::getValue, toSet()))); // TODO
 
         Map<String, Set<Person>> expected = new HashMap<>();
         expected.put("epam", new HashSet<>(Arrays.asList(
@@ -149,7 +160,13 @@ public class StreamsExercise2 {
      */
     @Test
     public void indexByFirstEmployer() {
-        Map<String, Set<Person>> result = null; // TODO
+        Map<String, Set<Person>> result = getEmployees().stream()
+                        .flatMap(e -> e.getJobHistory().stream().limit(1)
+                                .collect(toMap(JobHistoryEntry::getEmployer,
+                                        (x) -> e.getPerson(), (x, y)-> x)).entrySet()
+                                .stream())
+                        .collect(groupingBy(Map.Entry::getKey,
+                                mapping(Map.Entry::getValue, toSet()))); // TODO
 
 
         Map<String, Set<Person>> expected = new HashMap<>();
@@ -178,7 +195,14 @@ public class StreamsExercise2 {
      */
     @Test
     public void greatestExperiencePerEmployer() {
-        Map<String, Person> result = null;// TODO
+        Map<String, Person> result =
+                getEmployees().stream().flatMap(e->
+                        e.getJobHistory().stream().collect(groupingBy(JobHistoryEntry::getEmployer,
+                                        summingInt(JobHistoryEntry::getDuration)))
+                                .entrySet().stream()
+                                .map((jhe)->new Triple(e.getPerson(),jhe.getKey(),jhe.getValue()))
+                        ).collect(groupingBy(Triple::getEmployer,
+                        collectingAndThen(Collectors.maxBy(Comparator.comparing(Triple::getDuration)), (x)-> x.get().getPerson())));
 
         Map<String, Person> expected = new HashMap<>();
         expected.put("epam", new Person("John", "White", 28));
@@ -188,6 +212,31 @@ public class StreamsExercise2 {
         assertEquals(expected, result);
     }
 
+    class Triple {
+        final Person person;
+        final String employer;
+        final int duration;
+
+        public Triple(Person person, String employer, int duration) {
+            this.person = person;
+            this.employer = employer;
+            this.duration = duration;
+        }
+
+        public Person getPerson() {
+            return person;
+        }
+
+        public String getEmployer() {
+            return employer;
+        }
+
+        public int getDuration() {
+            return duration;
+        }
+
+        public Triple changeDuration(int newDur){return new Triple(person,employer, newDur); }
+    }
 
     private List<Employee> getEmployees() {
         return Arrays.asList(
