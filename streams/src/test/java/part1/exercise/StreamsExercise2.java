@@ -187,9 +187,6 @@ public class StreamsExercise2 {
                 new Person("John", "Doe", 30)
         )));
         assertEquals(expected, result);
-
-
-//        throw new UnsupportedOperationException();
     }
 
     /**
@@ -207,13 +204,11 @@ public class StreamsExercise2 {
                         ).collect(groupingBy(Triple::getEmployer,
                         collectingAndThen(Collectors.maxBy(Comparator.comparing(Triple::getDuration)), (x)-> x.get().getPerson())));
 
-
         Map<String, Person> expected = new HashMap<>();
         expected.put("epam", new Person("John", "White", 28));
         expected.put("google", new Person("John", "Galt", 29));
         expected.put("yandex", new Person("John", "Doe", 30));
         expected.put("abc", new Person("John", "Doe", 30));
-
         assertEquals(expected, result);
     }
 
