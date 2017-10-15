@@ -96,6 +96,7 @@ public class Lambdas01 {
             assertNotNull(personOptional.get());
             assertEquals(new Person("name 1", "lastName 2", 40), personOptional.get());
         }
+
     }
 
     @Test

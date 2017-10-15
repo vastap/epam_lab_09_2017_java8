@@ -3,6 +3,8 @@ package lambda.part1.exercise;
 import org.junit.Test;
 
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -18,21 +20,28 @@ public class Lambdas03Exercise {
 
     @Test
     public void generic0() {
-        final GenericProduct<Integer> prod = null; // Use anonymous class
+        final GenericProduct<Integer> prod = new GenericProduct<Integer>() {
+            @Override
+            public Integer prod(Integer a, int i) {
+                return a * i;
+            }
+        }; // Use anonymous class
 
         assertEquals(prod.prod(3, 2), Integer.valueOf(6));
     }
 
     @Test
     public void generic1() {
-        final GenericProduct<Integer> prod = null; // Use statement lambda
+        final GenericProduct<Integer> prod = (a, i) -> {
+            return a * i; // Use statement lambda
+        };
 
         assertEquals(prod.prod(3, 2), Integer.valueOf(6));
     }
 
     @Test
     public void generic2() {
-        final GenericProduct<Integer> prod = null; // Use expression lambda
+        final GenericProduct<Integer> prod = (a, i) -> a * i; // Use expression lambda
 
         assertEquals(prod.prod(3, 2), Integer.valueOf(6));
     }
@@ -45,11 +54,17 @@ public class Lambdas03Exercise {
         return sb.toString();
     }
 
+    private static String stringGenerator(String s, int i) {
+        return Stream.generate(() -> s).limit(i).collect(Collectors.joining());
+    }
+
     @Test
     public void strSum() {
-        final GenericProduct<String> prod = null; // use stringProd;
+        final GenericProduct<String> prod = Lambdas03Exercise::stringProd; // use stringProd;
+        final GenericProduct<String> prod2 = Lambdas03Exercise::stringGenerator;
 
         assertEquals(prod.prod("a", 2), "aa");
+        assertEquals(prod2.prod("a", 3), "aaa");
     }
 
     private final String delimeter = "-";
@@ -64,7 +79,7 @@ public class Lambdas03Exercise {
 
     @Test
     public void strSum2() {
-        final GenericProduct<String> prod = null; // use stringSumWithDelimeter;
+        final GenericProduct<String> prod = this::stringSumWithDelimeter; // use stringSumWithDelimeter;
 
         assertEquals(prod.prod("a", 3), "a-a-a");
     }
