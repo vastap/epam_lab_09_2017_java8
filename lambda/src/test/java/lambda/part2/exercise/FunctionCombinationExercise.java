@@ -5,7 +5,6 @@ import org.junit.Test;
 
 import java.util.function.Predicate;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -21,14 +20,16 @@ public class FunctionCombinationExercise {
         assertFalse(validate.test(new Person("a", "", 0)));
     }
 
+    // TODO
     // negate1: (Person -> boolean) -> (Person -> boolean)
     private Predicate<Person> negate1(Predicate<Person> test) {
         return p -> !test.test(p);
     }
 
+    // TODO
     // validateFirstNameAndLastName: (Person -> boolean, Person -> boolean) -> (Person -> boolean)
     private Predicate<Person> validateFirstNameAndLastName(Predicate<Person> t1, Predicate<Person> t2) {
-        return p -> t2.test(p) && t1.test(p);
+        return p -> t1.test(p) && t2.test(p);
     }
 
     @Test
@@ -46,11 +47,13 @@ public class FunctionCombinationExercise {
         assertFalse(validate.test(new Person("a", "", 0)));
     }
 
+    // TODO
     // negate: (T -> boolean) -> (T -> boolean)
     private <T> Predicate<T> negate(Predicate<T> test) {
-        return t -> !test.test(t) && test.test(t);
+        return t -> !test.test(t);
     }
 
+    // TODO
     // and: (T -> boolean, T -> boolean) -> (T -> boolean)
     private <T> Predicate<T> and(Predicate<T> t1, Predicate<T> t2) {
         return t -> t1.test(t) && t2.test(t);
@@ -61,8 +64,8 @@ public class FunctionCombinationExercise {
         Predicate<Person> hasEmptyFirstName = p -> p.getFirstName().isEmpty();
         Predicate<Person> hasEmptyLastName = p -> p.getLastName().isEmpty();
 
-        Predicate<Person> validateFirstName = hasEmptyFirstName.negate();
-        Predicate<Person> validateLastName = hasEmptyLastName.negate();
+        Predicate<Person> validateFirstName = negate(hasEmptyFirstName);
+        Predicate<Person> validateLastName = negate(hasEmptyLastName);
 
         Predicate<Person> validate = and(validateFirstName, validateLastName);
 
