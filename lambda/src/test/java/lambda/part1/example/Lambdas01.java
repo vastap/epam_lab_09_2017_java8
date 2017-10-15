@@ -14,9 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 // JSR-335 Lambda Expressions for the Java Programming Language
 
@@ -32,15 +30,12 @@ public class Lambdas01 {
                 new Person("name 1", "lastName 2", 40),
                 new Person("name 2", "lastName 1", 30)
         };
-
         Arrays.sort(persons, new Comparator<Person>() {
-
             @Override
             public int compare(Person o1, Person o2) {
                 return o1.getLastName().compareTo(o2.getLastName());
             }
         });
-
         assertArrayEquals(new Person[]{
                 new Person("name 2", "lastName 1", 30),
                 new Person("name 1", "lastName 2", 40),
@@ -56,7 +51,6 @@ public class Lambdas01 {
                 new Person("name 2", "lastName 1", 30),
                 new Person("name 1", "lastName 3", 40)
         );
-
         Person person = null;
         for (Person p : persons) {
             if ("name 1".equals(p.getFirstName())) {
@@ -64,11 +58,9 @@ public class Lambdas01 {
                 break;
             }
         }
-
         if (person != null) {
             person.print();
         }
-
         assertNotNull(person);
         assertEquals(new Person("name 1", "lastName 2", 40), person);
     }
@@ -78,19 +70,18 @@ public class Lambdas01 {
         List<Person> persons = ImmutableList.of(
                 new Person("name 3", "lastName 3", 20),
                 new Person("name 1", "lastName 2", 40),
-                new Person("name 2", "lastName 1", 30)
+                new Person("name 2", "lastName 1", 30),
+                new Person("name 1", "lastName 3", 40)
         );
-
         final Optional<Person> personOptional =
                 FluentIterable.from(persons)
-                              .firstMatch(new Predicate<Person>() {
+                        .firstMatch(new Predicate<Person>() {
 
-                                  @Override
-                                  public boolean apply(Person p) {
-                                        return "name 1".equals(p.getFirstName());
-                                    }
-                              });
-
+                            @Override
+                            public boolean apply(Person p) {
+                                return "name 1".equals(p.getFirstName());
+                            }
+                        });
         if (personOptional.isPresent()) {
             personOptional.get().print();
             assertNotNull(personOptional.get());
@@ -105,17 +96,14 @@ public class Lambdas01 {
                 new Person("name 1", "lastName 2", 40),
                 new Person("name 2", "lastName 1", 30)
         );
-
         final Map<String, Person> personByLastName =
                 FluentIterable.from(persons)
-                              .uniqueIndex(new Function<Person, String>() {
-                                @Override
-                                public String apply(Person person) {
-                                    return person.getLastName();
-                                }
-                              });
-
-        assertEquals(personByLastName.get("lastName 3"), new Person("name 3", "lastName 3", 20));
+                        .uniqueIndex(new Function<Person, String>() {
+                            @Override
+                            public String apply(Person person) {
+                                return person.getLastName();
+                            }
+                        });
+        assertEquals(new Person("name 3", "lastName 3", 20), personByLastName.get("lastName 3"));
     }
-
 }

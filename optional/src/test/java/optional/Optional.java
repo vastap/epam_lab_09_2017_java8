@@ -10,7 +10,6 @@ import java.util.function.Supplier;
 public class Optional<T> {
 
     private static final Optional<?> EMPTY = new Optional<>();
-
     private final T value;
 
     private Optional() {
@@ -45,7 +44,7 @@ public class Optional<T> {
 
     public T get() {
         if (!isPresent()) {
-            throw new NoSuchElementException("Haven't value");
+            throw new NoSuchElementException("No such value");
         }
         return value;
     }
@@ -61,9 +60,8 @@ public class Optional<T> {
     public <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) {
         if (isPresent()) {
             return value;
-        } else {
-            throw exceptionSupplier.get();
         }
+        throw exceptionSupplier.get();
     }
 
     public Optional<T> filter(Predicate<? super T> predicate) {
@@ -90,12 +88,3 @@ public class Optional<T> {
         }
     }
 }
-
-
-
-
-
-
-
-
-

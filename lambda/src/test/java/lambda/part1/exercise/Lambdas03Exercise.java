@@ -2,12 +2,14 @@ package lambda.part1.exercise;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
 public class Lambdas03Exercise {
-
     private interface GenericProduct<T> {
         T prod(T a, int i);
 
@@ -18,23 +20,31 @@ public class Lambdas03Exercise {
 
     @Test
     public void generic0() {
-        final GenericProduct<Integer> prod = null; // Use anonymous class
-
-        assertEquals(prod.prod(3, 2), Integer.valueOf(6));
+        // Use anonymous class
+        final GenericProduct<Integer> prod = new GenericProduct<Integer>() {
+            @Override
+            public Integer prod(Integer a, int i) {
+                return a * i;
+            }
+        };
+        assertEquals(Integer.valueOf(6), prod.prod(3, 2));
     }
 
     @Test
     public void generic1() {
-        final GenericProduct<Integer> prod = null; // Use statement lambda
-
-        assertEquals(prod.prod(3, 2), Integer.valueOf(6));
+        // Use statement lambda
+        final GenericProduct<Integer> prod = (Integer num, int i) -> {
+            int result = num * i;
+            return result;
+        };
+        assertEquals(Integer.valueOf(6), prod.prod(3, 2));
     }
 
     @Test
     public void generic2() {
-        final GenericProduct<Integer> prod = null; // Use expression lambda
-
-        assertEquals(prod.prod(3, 2), Integer.valueOf(6));
+        // Use expression lambda
+        final GenericProduct<Integer> prod = (Integer num, int i) -> num * i;
+        assertEquals(Integer.valueOf(6), prod.prod(3, 2));
     }
 
     private static String stringProd(String s, int i) {
@@ -45,29 +55,53 @@ public class Lambdas03Exercise {
         return sb.toString();
     }
 
-    @Test
-    public void strSum() {
-        final GenericProduct<String> prod = null; // use stringProd;
-
-        assertEquals(prod.prod("a", 2), "aa");
+    private static String stringProdByStream(String s, int i) {
+        String[] array = new String[i];
+        Arrays.fill(array, s);
+        return Stream.of(array).collect(Collectors.joining());
     }
 
-    private final String delimeter = "-";
+    @Test
+    public void strSum() {
+        // use stringProd :: class method-reference lambda
+        final GenericProduct<String> prod = Lambdas03Exercise::stringProd; // use stringProd;
+        assertEquals("aa", prod.prod("a", 2));
+    }
 
-    private String stringSumWithDelimeter(String s, int i) {
-        final StringJoiner sj = new StringJoiner(delimeter);
+    @Test
+    public void strSumByStream() {
+        // use stringProdByStream :: class method-reference lambda
+        final GenericProduct<String> prod = Lambdas03Exercise::stringProdByStream; // use stringProdByStream;
+        assertEquals("aa", prod.prod("a", 2));
+    }
+
+    private final String delimiter = "-";
+
+    private String stringSumWithDelimiter(String s, int i) {
+        final StringJoiner sj = new StringJoiner(delimiter);
         for (int j = 0; j < i; j++) {
             sj.add(s);
         }
         return sj.toString();
     }
 
-    @Test
-    public void strSum2() {
-        final GenericProduct<String> prod = null; // use stringSumWithDelimeter;
-
-        assertEquals(prod.prod("a", 3), "a-a-a");
+    private String stringSumWithDelimiterByStream(String s, int i) {
+        String[] array = new String[i];
+        Arrays.fill(array, s);
+        return Stream.of(array).collect(Collectors.joining("-"));
     }
 
+    @Test
+    public void strSum2() {
+        // use stringSumWithDelimiter :: object method-reference lambda
+        final GenericProduct<String> prod = this::stringSumWithDelimiter;
+        assertEquals("a-a-a", prod.prod("a", 3));
+    }
 
+    @Test
+    public void strSum2ByStream() {
+        // use stringSumWithDelimiterByStream :: object method-reference lambda
+        final GenericProduct<String> prod = this::stringSumWithDelimiterByStream;
+        assertEquals("a-a-a", prod.prod("a", 3));
+    }
 }
