@@ -73,7 +73,13 @@ public class StreamsExercise2 {
     @Test
     public void employersStuffList() {
         List<Employee> employees = getEmployees();
-        Map<String, Set<Person>> result = null; // TODO
+        Map<String, Set<Person>> result =  getEmployees().stream()
+                .flatMap(e -> e.getJobHistory().stream()
+                        .collect(toMap(JobHistoryEntry::getEmployer,
+                                (x) -> e.getPerson(), (x, y)-> x)).entrySet()
+                        .stream())
+                .collect(groupingBy(Map.Entry::getKey,
+                        mapping(Map.Entry::getValue, toSet()))); // TODO
 
         Map<String, Set<Person>> expected = new HashMap<>();
         expected.put("epam", new HashSet<>(Arrays.asList(
@@ -108,18 +114,6 @@ public class StreamsExercise2 {
                 new Person("John", "Doe", 30)
         )));
         assertEquals(expected, result);
-    public void employersStuffLists() {
-        Map<String, List<Person>> employersStuffLists =
-                getEmployees().stream()
-                .flatMap(e -> e.getJobHistory().stream()
-                        .collect(toMap(JobHistoryEntry::getEmployer,
-                                (x) -> e.getPerson(), (x, y)-> x)).entrySet()
-                        .stream())
-                .collect(groupingBy(Map.Entry::getKey,
-                        mapping(Map.Entry::getValue, toList())));// TODO
-        System.out.println(employersStuffLists);
-
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -166,7 +160,13 @@ public class StreamsExercise2 {
      */
     @Test
     public void indexByFirstEmployer() {
-        Map<String, Set<Person>> result = null; // TODO
+        Map<String, Set<Person>> result = getEmployees().stream()
+                        .flatMap(e -> e.getJobHistory().stream().limit(1)
+                                .collect(toMap(JobHistoryEntry::getEmployer,
+                                        (x) -> e.getPerson(), (x, y)-> x)).entrySet()
+                                .stream())
+                        .collect(groupingBy(Map.Entry::getKey,
+                                mapping(Map.Entry::getValue, toSet()))); // TODO
 
 
         Map<String, Set<Person>> expected = new HashMap<>();
@@ -187,15 +187,6 @@ public class StreamsExercise2 {
                 new Person("John", "Doe", 30)
         )));
         assertEquals(expected, result);
-        Map<String, List<Person>> employeesIndex =
-                getEmployees().stream()
-                .flatMap(e -> e.getJobHistory().stream().limit(1)
-                        .collect(toMap(JobHistoryEntry::getEmployer,
-                                (x) -> e.getPerson(), (x, y)-> x)).entrySet()
-                        .stream().peek(System.out::println))
-                .collect(groupingBy(Map.Entry::getKey,
-                        mapping(Map.Entry::getValue, toList())));
-        System.out.println(employeesIndex);
 
 
 //        throw new UnsupportedOperationException();
@@ -207,7 +198,7 @@ public class StreamsExercise2 {
      */
     @Test
     public void greatestExperiencePerEmployer() {
-        Map<String, Person> employeesIndex =
+        Map<String, Person> result =
                 getEmployees().stream().flatMap(e->
                         e.getJobHistory().stream().collect(groupingBy(JobHistoryEntry::getEmployer,
                                         summingInt(JobHistoryEntry::getDuration)))
@@ -217,11 +208,12 @@ public class StreamsExercise2 {
                         collectingAndThen(Collectors.maxBy(Comparator.comparing(Triple::getDuration)), (x)-> x.get().getPerson())));
 
 
-        Map<String, Set<Person>> expected = new HashMap<>();
-        expected.put("epam", Collections.singleton(new Person("John", "White", 28)));
-        expected.put("google", Collections.singleton(new Person("John", "Galt", 29)));
-        expected.put("yandex", Collections.singleton(new Person("John", "Doe", 30)));
-        expected.put("abc", Collections.singleton(new Person("John", "Doe", 30)));
+        Map<String, Person> expected = new HashMap<>();
+        expected.put("epam", new Person("John", "White", 28));
+        expected.put("google", new Person("John", "Galt", 29));
+        expected.put("yandex", new Person("John", "Doe", 30));
+        expected.put("abc", new Person("John", "Doe", 30));
+
         assertEquals(expected, result);
     }
 
