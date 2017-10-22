@@ -6,6 +6,7 @@ import data.Person;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 
@@ -68,8 +69,14 @@ public class StreamsExercise2 {
     @Test
     public void employersStuffList() {
         List<Employee> employees = getEmployees();
-        Map<String, Set<Person>> result = null; // TODO
+        Map<String, Set<Person>> actual = employees.stream()
+                .flatMap(employee -> employee.getJobHistory().stream()
+                        .map(JobHistoryEntry::getEmployer)
+                        .map(employer -> new EmployerPersonPair(employer, employee.getPerson()))
+                ).collect(Collectors.groupingBy(EmployerPersonPair::getEmployer,
+                        Collectors.mapping(EmployerPersonPair::getPerson, Collectors.toSet())));
 
+        // Expected result
         Map<String, Set<Person>> expected = new HashMap<>();
         expected.put("epam", new HashSet<>(Arrays.asList(
                 new Person("John", "Galt", 20),
@@ -102,7 +109,7 @@ public class StreamsExercise2 {
                 new Person("Bob", "Doe", 27),
                 new Person("John", "Doe", 30)
         )));
-        assertEquals(expected, result);
+        assertEquals(expected, actual);
     }
 
     /**
@@ -149,8 +156,12 @@ public class StreamsExercise2 {
      */
     @Test
     public void indexByFirstEmployer() {
-        Map<String, Set<Person>> result = null; // TODO
-
+        Map<String, Set<Person>> result = getEmployees().stream()
+                .flatMap(employee -> employee.getJobHistory().stream()
+                        .limit(1)
+                        .map(historyEntry -> new EmployerPersonPair(historyEntry.getEmployer(), employee.getPerson())))
+                .collect(Collectors.groupingBy(EmployerPersonPair::getEmployer,
+                        Collectors.mapping(EmployerPersonPair::getPerson, Collectors.toSet())));
 
         Map<String, Set<Person>> expected = new HashMap<>();
         expected.put("epam", new HashSet<>(Arrays.asList(
@@ -178,7 +189,14 @@ public class StreamsExercise2 {
      */
     @Test
     public void greatestExperiencePerEmployer() {
-        Map<String, Person> result = null;// TODO
+        Map<String, Person> result = getEmployees().stream()
+                .flatMap(employee -> employee.getJobHistory().stream()
+                        .collect(Collectors.groupingBy(JobHistoryEntry::getEmployer, Collectors.summingInt(JobHistoryEntry::getDuration)))
+                        .entrySet().stream()
+                        .map(pair -> new EmployerPersonWithYears(pair.getKey(), employee.getPerson(), pair.getValue())))
+                .collect(Collectors.groupingBy(EmployerPersonWithYears::getEmployer,
+                        Collectors.collectingAndThen(Collectors.maxBy(Comparator.comparing(EmployerPersonWithYears::getDuration)),
+                                elem -> elem.get().getPerson())));
 
         Map<String, Person> expected = new HashMap<>();
         expected.put("epam", new Person("John", "White", 28));
@@ -188,71 +206,111 @@ public class StreamsExercise2 {
         assertEquals(expected, result);
     }
 
-
+    /**
+     * Get source test data for stream tests
+     *
+     * @return List of Employee with JobHistoryEntries
+     */
     private List<Employee> getEmployees() {
         return Arrays.asList(
-            new Employee("John", "Galt", 20,
-                    Arrays.asList(
-                            new JobHistoryEntry(3, "dev", "epam"),
-                            new JobHistoryEntry(2, "dev", "google")
-                    )),
-            new Employee("John", "Doe", 21,
-                    Arrays.asList(
-                            new JobHistoryEntry(4, "BA", "yandex"),
-                            new JobHistoryEntry(2, "QA", "epam"),
-                            new JobHistoryEntry(2, "dev", "abc")
-                    )),
-            new Employee("John", "White", 22,
-                    Collections.singletonList(
-                            new JobHistoryEntry(6, "QA", "epam")
-                    )),
-            new Employee("John", "Galt", 23,
-                    Arrays.asList(
-                            new JobHistoryEntry(3, "dev", "epam"),
-                            new JobHistoryEntry(2, "dev", "google")
-                    )),
-            new Employee("John", "Doe", 24,
-                    Arrays.asList(
-                            new JobHistoryEntry(4, "QA", "yandex"),
-                            new JobHistoryEntry(2, "BA", "epam"),
-                            new JobHistoryEntry(2, "dev", "abc")
-                    )),
-            new Employee("John", "White", 25,
-                    Collections.singletonList(
-                            new JobHistoryEntry(6, "QA", "epam")
-                    )),
-            new Employee("John", "Galt", 26,
-                    Arrays.asList(
-                            new JobHistoryEntry(3, "dev", "epam"),
-                            new JobHistoryEntry(1, "dev", "google")
-                    )),
-            new Employee("Bob", "Doe", 27,
-                    Arrays.asList(
-                            new JobHistoryEntry(4, "QA", "yandex"),
-                            new JobHistoryEntry(2, "QA", "epam"),
-                            new JobHistoryEntry(2, "QA", "abc"),
-                            new JobHistoryEntry(2, "dev", "abc")
-                    )),
-            new Employee("John", "White", 28,
-                    Collections.singletonList(
-                            new JobHistoryEntry(8, "BA", "epam")
-                    )),
-            new Employee("John", "Galt", 29,
-                    Arrays.asList(
-                            new JobHistoryEntry(3, "dev", "epam"),
-                            new JobHistoryEntry(3, "dev", "google")
-                    )),
-            new Employee("John", "Doe", 30,
-                    Arrays.asList(
-                            new JobHistoryEntry(5, "QA", "yandex"),
-                            new JobHistoryEntry(2, "QA", "epam"),
-                            new JobHistoryEntry(5, "dev", "abc")
-                    )),
-            new Employee("Bob", "White", 31,
-                    Collections.singletonList(
-                            new JobHistoryEntry(6, "QA", "epam")
-                    ))
+                new Employee("John", "Galt", 20,
+                        Arrays.asList(
+                                new JobHistoryEntry(3, "dev", "epam"),
+                                new JobHistoryEntry(2, "dev", "google")
+                        )),
+                new Employee("John", "Doe", 21,
+                        Arrays.asList(
+                                new JobHistoryEntry(4, "BA", "yandex"),
+                                new JobHistoryEntry(2, "QA", "epam"),
+                                new JobHistoryEntry(2, "dev", "abc")
+                        )),
+                new Employee("John", "White", 22,
+                        Collections.singletonList(
+                                new JobHistoryEntry(6, "QA", "epam")
+                        )),
+                new Employee("John", "Galt", 23,
+                        Arrays.asList(
+                                new JobHistoryEntry(3, "dev", "epam"),
+                                new JobHistoryEntry(2, "dev", "google")
+                        )),
+                new Employee("John", "Doe", 24,
+                        Arrays.asList(
+                                new JobHistoryEntry(4, "QA", "yandex"),
+                                new JobHistoryEntry(2, "BA", "epam"),
+                                new JobHistoryEntry(2, "dev", "abc")
+                        )),
+                new Employee("John", "White", 25,
+                        Collections.singletonList(
+                                new JobHistoryEntry(6, "QA", "epam")
+                        )),
+                new Employee("John", "Galt", 26,
+                        Arrays.asList(
+                                new JobHistoryEntry(3, "dev", "epam"),
+                                new JobHistoryEntry(1, "dev", "google")
+                        )),
+                new Employee("Bob", "Doe", 27,
+                        Arrays.asList(
+                                new JobHistoryEntry(4, "QA", "yandex"),
+                                new JobHistoryEntry(2, "QA", "epam"),
+                                new JobHistoryEntry(2, "QA", "abc"),
+                                new JobHistoryEntry(2, "dev", "abc")
+                        )),
+                new Employee("John", "White", 28,
+                        Collections.singletonList(
+                                new JobHistoryEntry(8, "BA", "epam")
+                        )),
+                new Employee("John", "Galt", 29,
+                        Arrays.asList(
+                                new JobHistoryEntry(3, "dev", "epam"),
+                                new JobHistoryEntry(3, "dev", "google")
+                        )),
+                new Employee("John", "Doe", 30,
+                        Arrays.asList(
+                                new JobHistoryEntry(5, "QA", "yandex"),
+                                new JobHistoryEntry(2, "QA", "epam"),
+                                new JobHistoryEntry(5, "dev", "abc")
+                        )),
+                new Employee("Bob", "White", 31,
+                        Collections.singletonList(
+                                new JobHistoryEntry(6, "QA", "epam")
+                        ))
         );
     }
 
+    /**
+     * Util class to tie Person with employer
+     */
+    private static class EmployerPersonPair {
+        private final Person person;
+        private final String employer;
+
+        public EmployerPersonPair(String employer, Person person) {
+            this.employer = employer;
+            this.person = person;
+        }
+
+        public Person getPerson() {
+            return person;
+        }
+
+        public String getEmployer() {
+            return employer;
+        }
+    }
+
+    /**
+     * Util class to tie duration with employee
+     */
+    private static class EmployerPersonWithYears extends EmployerPersonPair {
+        private final int duration;
+
+        public EmployerPersonWithYears(String employer, Person person, int duration) {
+            super(employer, person);
+            this.duration = duration;
+        }
+
+        public int getDuration() {
+            return duration;
+        }
+    }
 }
