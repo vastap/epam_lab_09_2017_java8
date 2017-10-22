@@ -6,6 +6,7 @@ import data.Person;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -76,6 +77,14 @@ public class StreamsExercise2 {
                 ).collect(Collectors.groupingBy(EmployerPersonPair::getEmployer,
                         Collectors.mapping(EmployerPersonPair::getPerson, Collectors.toSet())));
 
+        // Also we can use AbstractMap.simpleEntry
+        Map<String, Set<Person>> actualWithEntry = employees.stream()
+                .flatMap(employee -> employee.getJobHistory().stream()
+                        .map(e -> e.getEmployer())
+                        .map(employer -> new AbstractMap.SimpleEntry<>(employer, employee.getPerson())))
+                .collect(Collectors.groupingBy(AbstractMap.SimpleEntry::getKey, Collectors.mapping(Entry::getValue,
+                        Collectors.toSet())));
+
         // Expected result
         Map<String, Set<Person>> expected = new HashMap<>();
         expected.put("epam", new HashSet<>(Arrays.asList(
@@ -110,6 +119,7 @@ public class StreamsExercise2 {
                 new Person("John", "Doe", 30)
         )));
         assertEquals(expected, actual);
+        assertEquals(expected, actualWithEntry);
     }
 
     /**
