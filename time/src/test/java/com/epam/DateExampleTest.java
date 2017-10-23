@@ -1,5 +1,6 @@
 package com.epam;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.text.DateFormat;
@@ -155,8 +156,10 @@ class DateExampleTest {
         dateFormat.setLenient(false);
         dateFormat.setTimeZone(tz);
 
-        Date moment = dateFormat.parse("2005-03-27 02:30:00");
-        System.out.println(moment);
+        // http://junit.org/junit5/docs/current/user-guide/#writing-tests-assertions
+        assertThrows(java.text.ParseException.class, () -> {
+            Date moment = dateFormat.parse("2005-03-27 02:30:00");
+        });
     }
 
     @Test
